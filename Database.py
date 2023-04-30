@@ -34,3 +34,8 @@ class Database:
                 result[columns[item]] = row[item]
             results.append(result)
         return results
+
+    def action_query(self, query: str):
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        return self.conn.commit()
