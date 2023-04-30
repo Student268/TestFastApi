@@ -18,8 +18,19 @@ class Database:
             self.conn.close()
             self.conn = None
 
-    def select_query(self, query):
+    # def select_query(self, query):
+    #     cursor = self.conn.cursor()
+    #     cursor.execute(query)
+    #     return cursor.fetchall()
+
+    def select_query(self, query: str) -> list:
         cursor = self.conn.cursor()
         cursor.execute(query)
-        return cursor.fetchall()
-
+        columns = [desc[0] for desc in cursor.description]
+        results = []
+        for row in cursor.fetchall():
+            result = {}
+            for item in range(len(columns)):
+                result[columns[item]] = row[item]
+            results.append(result)
+        return results

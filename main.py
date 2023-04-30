@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from Database import Database
+from Validation.users import Users
+from pydantic import BaseModel
+from typing import List
 
 
 app = FastAPI(title="FastApi")
@@ -16,21 +19,17 @@ async def shutdown():
     db.disconnect()
 
 
-@app.get("/users/{user_id}")
+@app.get("/users/{user_id}", response_model=List[Users])
 def get_user(user_id: int):
-    result = db.select_query(f"SELECT * FROM users where user_id = {user_id}")
-    print(result)
-    return result
+    data = db.select_query(f"SELECT * FROM users where user_id = {user_id}")
+    if [user for user in data if user['user_id'] == user_id]:
+        return data
 
 
 @app.get("/users/")
 def get_users(limit: int = 1, offset: int = 0):
     result = db.select_query(f"SELECT * FROM users")
-    result_db = []
-    for item in result:
-        result_db = list(item)
-        print(result_db)
-    return result_db[offset:][:limit]
+    return result[offset:][:limit]
 
 
 @app.post("/users/{user_id}")
